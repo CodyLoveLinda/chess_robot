@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: jetcobot_description
+    relative_path: urdf/jetcobot.urdf
+    xacro_args: ""
+  SRDF:
+    relative_path: config/jetcobot.srdf
+  CONFIG:
+    author_name: jetcobot
+    author_email: jetcobot@qq.com
+    generated_timestamp: 1739011997
