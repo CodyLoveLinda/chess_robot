@@ -159,6 +159,20 @@ bool openGripper(moveit::planning_interface::MoveGroupInterface& move_group_inte
 
 bool pick(moveit::planning_interface::MoveGroupInterface& move_group_interface_arm,const geometry_msgs::Pose& target_pose,moveit::planning_interface::MoveGroupInterface& move_group_interface_gripper, const moveit::core::JointModelGroup*& joint_model_group_gripper, const std::string& str)
 {
+  geometry_msgs::Pose target_pose1;
+  target_pose1.orientation.w = 1.0;
+  target_pose1.position.x = 0.03193717954023739;
+  target_pose1.position.y = 0.1596810159055088;
+  target_pose1.position.z = 0.2616602376176956;
+  move_group_interface_arm.setPoseTarget(target_pose1);
+
+  moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+
+  bool success_test = (move_group_interface_arm.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+  if (success_test) {
+    move_group_interface_arm.execute(my_plan);
+  }
+
   moveit_msgs::RobotTrajectory trajectory;
   moveit_msgs::RobotTrajectory trajectory_2;
   const double jump_threshold = 0.0;
@@ -179,7 +193,7 @@ bool pick(moveit::planning_interface::MoveGroupInterface& move_group_interface_a
       // Execute the motion
       // move_group_interface_arm.move();
       move_group_interface_arm.execute(trajectory);
-      closeGripper(move_group_interface_gripper,joint_model_group_gripper, str);
+      //closeGripper(move_group_interface_gripper,joint_model_group_gripper, str);
       move_group_interface_arm.computeCartesianPath(waypoints_2, eef_step, jump_threshold, trajectory_2);
       move_group_interface_arm.execute(trajectory_2);
       ROS_INFO("Robot moved to the target pose successfully.");
