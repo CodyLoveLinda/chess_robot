@@ -66,12 +66,12 @@ double findJointAngle(const std::string& key) {
 double find_z_offset(const std::string& key) {
     // Dictionary mapping strings to double values
     std::unordered_map<std::string, double> dictionary = {
-        {"k", 0.13},
-        {"q", 0.13},
-        {"b", 0.13},
-        {"r", 0.13},
-        {"n", 0.13},
-        {"p", 0.13}
+        {"k", 0.013},
+        {"q", 0.013},
+        {"b", 0.013},
+        {"r", 0.013},
+        {"n", 0.013},
+        {"p", 0.013}
         // Add more entries as needed
     };
 
@@ -104,7 +104,7 @@ bool closeGripper(moveit::planning_interface::MoveGroupInterface& move_group_int
 
   // Now, let's modify one of the joints, plan to the new joint space goal and visualize the plan.
   // joint_group_positions[0] = 0.6981317;
-  joint_group_positions[0] = findJointAngle(str);   
+  joint_group_positions[0] = findJointAngle(str);
   move_group_interface_gripper.setJointValueTarget(joint_group_positions);
   moveit::planning_interface::MoveGroupInterface::Plan gripper_plan;
 
@@ -137,7 +137,7 @@ bool openGripper(moveit::planning_interface::MoveGroupInterface& move_group_inte
 
   // Now, let's modify one of the joints, plan to the new joint space goal and visualize the plan.
   // joint_group_positions[0] = 0.6981317;
-  joint_group_positions[0] = 0.51;   
+  joint_group_positions[0] = 0.51;
   move_group_interface_gripper.setJointValueTarget(joint_group_positions);
   moveit::planning_interface::MoveGroupInterface::Plan gripper_plan;
 
@@ -159,12 +159,17 @@ bool openGripper(moveit::planning_interface::MoveGroupInterface& move_group_inte
 
 bool pick(moveit::planning_interface::MoveGroupInterface& move_group_interface_arm,const geometry_msgs::Pose& target_pose,moveit::planning_interface::MoveGroupInterface& move_group_interface_gripper, const moveit::core::JointModelGroup*& joint_model_group_gripper, const std::string& str)
 {
-  geometry_msgs::Pose target_pose1;
+
+  ROS_INFO("Position: x = %f, y = %f, z = %f", target_pose.position.x, target_pose.position.y, target_pose.position.z);
+  ROS_INFO("Orientation: x = %f, y = %f, z = %f, w = %f", target_pose.orientation.x, target_pose.orientation.y, target_pose.orientation.z, target_pose.orientation.w);
+
+  /*geometry_msgs::Pose target_pose1;
   target_pose1.orientation.w = 1.0;
   target_pose1.position.x = 0.03193717954023739;
   target_pose1.position.y = 0.1596810159055088;
-  target_pose1.position.z = 0.2616602376176956;
-  move_group_interface_arm.setPoseTarget(target_pose1);
+  target_pose1.position.z = 0.2616602376176956;*/
+
+  move_group_interface_arm.setPoseTarget(target_pose);
 
   moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
@@ -205,8 +210,33 @@ bool pick(moveit::planning_interface::MoveGroupInterface& move_group_interface_a
   return success;
 }
 
+void goInit(moveit::planning_interface::MoveGroupInterface& move_group_interface_arm)
+{
+  move_group_interface_arm.setNamedTarget("init");
+
+  moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+
+  bool success = (move_group_interface_arm.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+  if (success) {
+    move_group_interface_arm.execute(my_plan);
+  } else {
+    ROS_ERROR("Failed to plan the motion to the init.");
+  }
+}
+
 bool place(moveit::planning_interface::MoveGroupInterface& move_group_interface_arm,const geometry_msgs::Pose& target_pose,moveit::planning_interface::MoveGroupInterface& move_group_interface_gripper, const moveit::core::JointModelGroup*& joint_model_group_gripper, const std::string& str)
 {
+  ROS_INFO("Position: x = %f, y = %f, z = %f", target_pose.position.x, target_pose.position.y, target_pose.position.z);
+  ROS_INFO("Orientation: x = %f, y = %f, z = %f, w = %f", target_pose.orientation.x, target_pose.orientation.y, target_pose.orientation.z, target_pose.orientation.w);
+  move_group_interface_arm.setPoseTarget(target_pose);
+
+  moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+
+  bool success_test = (move_group_interface_arm.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+  if (success_test) {
+    move_group_interface_arm.execute(my_plan);
+  }
+
   moveit_msgs::RobotTrajectory trajectory;
   moveit_msgs::RobotTrajectory trajectory_2;
   const double jump_threshold = 0.0;
@@ -227,7 +257,7 @@ bool place(moveit::planning_interface::MoveGroupInterface& move_group_interface_
       // Execute the motion
       // move_group_interface_arm.move();
       move_group_interface_arm.execute(trajectory);
-      openGripper(move_group_interface_gripper,joint_model_group_gripper);
+      //openGripper(move_group_interface_gripper,joint_model_group_gripper);
       move_group_interface_arm.computeCartesianPath(waypoints_2, eef_step, jump_threshold, trajectory_2);
       move_group_interface_arm.execute(trajectory_2);
       ROS_INFO("Robot moved to the target pose successfully.");
@@ -252,7 +282,7 @@ bool poseCallback(chess_robot_service::motion_planning::Request  &req, chess_rob
   std::string part;
   std::string chess_piece;
   std::string capturing;
-  std::string castling; 
+  std::string castling;
 
   // Splitting the move_command string by comma and storing the parts in a vector
   while (std::getline(iss, part, ',')) {
@@ -271,7 +301,7 @@ bool poseCallback(chess_robot_service::motion_planning::Request  &req, chess_rob
   static const std::string PLANNING_GROUP_GRIPPER = "gripper_group";
 
   moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
-  
+
   // The :planning_interface:`MoveGroupInterface` class can be easily
   // setup using just the name of the planning group you would like to control and plan for.
   moveit::planning_interface::MoveGroupInterface move_group_interface_arm(PLANNING_GROUP_ARM);
@@ -291,7 +321,7 @@ bool poseCallback(chess_robot_service::motion_planning::Request  &req, chess_rob
 
   moveit::planning_interface::MoveGroupInterface::Plan my_plan_arm;
   bool success=false;
-  
+
   // to use cartisan path planning
   moveit_msgs::RobotTrajectory trajectory;
   const double jump_threshold = 0.0;
@@ -308,11 +338,11 @@ bool poseCallback(chess_robot_service::motion_planning::Request  &req, chess_rob
   primitive.dimensions.resize(3);
   primitive.dimensions[primitive.BOX_X] = 0.8;
   primitive.dimensions[primitive.BOX_Y] = 3;
-  primitive.dimensions[primitive.BOX_Z] = 1.03;
+  primitive.dimensions[primitive.BOX_Z] = 0.03;
 
   geometry_msgs::Pose box_pose;
   box_pose.orientation.w = 1.0;
-  box_pose.position.x = 0;
+  box_pose.position.x = -0.01;
   box_pose.position.y = 0.0;
   box_pose.position.z = -0.55;
 
@@ -325,7 +355,7 @@ bool poseCallback(chess_robot_service::motion_planning::Request  &req, chess_rob
 
   ROS_INFO_NAMED("tutorial", "Add an object into the world");
   planning_scene_interface.addCollisionObjects(collision_objects);
-  openGripper(move_group_interface_gripper,joint_model_group_gripper);
+  //openGripper(move_group_interface_gripper,joint_model_group_gripper);
   int count=0;
 
 
@@ -369,14 +399,14 @@ bool poseCallback(chess_robot_service::motion_planning::Request  &req, chess_rob
           ROS_ERROR("Robot didnot place the chess piece successfully.");
       }
     // waypoints.pop_back();
- 
 
-   }  
+
+   }
     // waypoints.push_back(pose);
     // waypoints.push_back(pose.position.x-0.1);
-    
+
     // move_group_interface_arm.setPoseTarget(pose);
-    
+
     // success = (move_group_interface_arm.plan(my_plan_arm) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
     // success = (move_group_interface_arm.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
 
@@ -392,6 +422,7 @@ bool poseCallback(chess_robot_service::motion_planning::Request  &req, chess_rob
   {
     res.feedback=false;
   }
+  goInit(move_group_interface_arm);
   return true;
 
 
@@ -409,7 +440,7 @@ int main(int argc, char** argv)
 
   // ros::Subscriber sub = nh.subscribe("pose_topic",10, poseCallback);
 
-  
+
   // ROS spinning must be running for the MoveGroupInterface to get information
   // about the robot's state. One way to do this is to start an AsyncSpinner
   // beforehand.
@@ -418,4 +449,3 @@ int main(int argc, char** argv)
   ros::waitForShutdown();
   return 0;
 }
-
