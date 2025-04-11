@@ -46,10 +46,10 @@ class ChessPoseConverter:
         move_command = self.ai_service(self.chess_board_state_home).command
         # Convert move command to robot poses and send to robot service
         self.send_poses_to_robot(move_command)
-        
+
     def send_poses_to_robot(self, move_command):
         # Convert move command to robot poses and send to robot service
-        
+
         command_sub_parts=move_command.split(',')
         steps, capturing, castling = command_sub_parts[:3]
         if len(command_sub_parts) != 4 and capturing =="no" and castling =="no":
@@ -59,7 +59,7 @@ class ChessPoseConverter:
             robot_pose_list.header.frame_id = "pedestal"  # Assuming your robot's frame ID is "base_link"
             robot_pose_list.header.stamp = rospy.Time.now()
 
-            
+
             # Assuming you have a function to convert chess notation to pose quaternion
             # For demonstration purpose, let's say we have a dummy function called "convert_chess_to_pose"
             # chess_notation=msg.data
@@ -76,7 +76,7 @@ class ChessPoseConverter:
                 # Publish the converted pose
                 # robot_pose_list.poses.append(robot_pose)
                 pose_list.append(robot_pose)
-                
+
             robot_pose_list.poses=pose_list
             a = ''.join(move_1)  # Concatenate the file and rank into a single string
             chess_piece = self.board.piece_at(chess.parse_square(a))
@@ -97,7 +97,7 @@ class ChessPoseConverter:
             robot_pose_list.header.frame_id = "pedestal"  # Assuming your robot's frame ID is "base_link"
             robot_pose_list.header.stamp = rospy.Time.now()
 
-            
+
             # Assuming you have a function to convert chess notation to pose quaternion
             # For demonstration purpose, let's say we have a dummy function called "convert_chess_to_pose"
             # chess_notation=msg.data
@@ -110,13 +110,13 @@ class ChessPoseConverter:
             chess_piece_1 = self.board.piece_at(chess.parse_square(a))
             # print(chess_piece_1)
             chess_piece=chess_piece_1.symbol()
-            
+
             if(chess_piece.isupper()):
                 self.white_capture_count=+1
-                move_2=self.get_coordinate(self.white_capture_count,chess_piece)                
+                move_2=self.get_coordinate(self.white_capture_count,chess_piece)
             else:
                  self.black_capture_count=+1
-                 move_2=self.get_coordinate(self.black_capture_count,chess_piece)    
+                 move_2=self.get_coordinate(self.black_capture_count,chess_piece)
             moves_capture=[move_1,move_2]
             moves_movement=[move_3,move_4]
             pose_list=[]
@@ -129,16 +129,16 @@ class ChessPoseConverter:
                 # Publish the converted pose
                 # robot_pose_list.poses.append(robot_pose)
                 pose_list.append(robot_pose)
-                
+
             # a = ''.join(move_1)  # Concatenate the file and rank into a single string
             # chess_piece = self.board.piece_at(chess.parse_square(a)).symbol()
-                
+
             robot_pose_list.poses=pose_list
 
             move_details = chess_piece + "," + capturing + "," + castling
             # Wait for feedback from robot service
             outcome_1 = self.robot_service(robot_pose_list, move_details).feedback
-            
+
             pose_list=[]
 
             for i in range(2):
@@ -149,7 +149,7 @@ class ChessPoseConverter:
                 # Publish the converted pose
                 # robot_pose_list.poses.append(robot_pose)
                 pose_list.append(robot_pose)
-                
+
             robot_pose_list.poses=pose_list
             a = ''.join(move_3)  # Concatenate the file and rank into a single string
             chess_piece_1 = self.board.piece_at(chess.parse_square(a))
@@ -172,7 +172,7 @@ class ChessPoseConverter:
             robot_pose_list.header.frame_id = "pedestal"  # Assuming your robot's frame ID is "base_link"
             robot_pose_list.header.stamp = rospy.Time.now()
 
-            
+
             # Assuming you have a function to convert chess notation to pose quaternion
             # For demonstration purpose, let's say we have a dummy function called "convert_chess_to_pose"
             # chess_notation=msg.data
@@ -186,7 +186,7 @@ class ChessPoseConverter:
             chess_piece_1 = self.board.piece_at(chess.parse_square(a))
             # print(chess_piece_1)
             chess_piece=chess_piece_1.symbol()
-              
+
             moves_start=[move_1,move_2]
             print()
             moves_end=[move_3,move_4]
@@ -200,16 +200,16 @@ class ChessPoseConverter:
                 # Publish the converted pose
                 # robot_pose_list.poses.append(robot_pose)
                 pose_list.append(robot_pose)
-                
+
             # a = ''.join(move_1)  # Concatenate the file and rank into a single string
             # chess_piece = self.board.piece_at(chess.parse_square(a)).symbol()
-                
+
             robot_pose_list.poses=pose_list
 
             move_details = chess_piece + "," + capturing + "," + castling
             # Wait for feedback from robot service
             outcome_1 = self.robot_service(robot_pose_list, move_details).feedback
-            
+
             pose_list=[]
 
             for i in range(2):
@@ -220,7 +220,7 @@ class ChessPoseConverter:
                 # Publish the converted pose
                 # robot_pose_list.poses.append(robot_pose)
                 pose_list.append(robot_pose)
-                
+
             robot_pose_list.poses=pose_list
             a = ''.join(move_3)  # Concatenate the file and rank into a single string
             chess_piece_1 = self.board.piece_at(chess.parse_square(a))
@@ -236,7 +236,7 @@ class ChessPoseConverter:
                 self.chess_board_state_home=self.board.fen()
                 print(self.chess_board_state_home)
                 self.process_next_move()
-        
+
 
 
     def convert_chess_to_pose(self, chess_notation):
@@ -246,50 +246,57 @@ class ChessPoseConverter:
             cross_reference_dict[letter] = str(i)
         cross_reference_dict["i"]=-2
         cross_reference_dict["j"]=-1
-        unit_square = 0.0375
+        #unit_square = 0.0375
+        unit_square = 0.0208
         robot_pose = Pose()
-        robot_pose.position.x=0.020 - unit_square*4
-        robot_pose.position.y=0.4185 - unit_square
-        robot_pose.position.z=0.22
-        robot_pose.orientation.x=0.00212
-        robot_pose.orientation.y=0.99998
-        robot_pose.orientation.z=-0.0059781
-        robot_pose.orientation.w=0.000400
-        
+        #robot_pose.position.x=-0.0138171 - unit_square*4
+        #robot_pose.position.y=0.693742 - unit_square
+        #robot_pose.position.z=0.415271
+        #1HGFEDCBA Y-->
+        #2 x |
+        #3   v
+        robot_pose.position.x=0.0 + unit_square*4 #A1 position
+        robot_pose.position.y=0.0 +  unit_square*4
+        robot_pose.position.z=0.26
+        robot_pose.orientation.x=0.0
+        robot_pose.orientation.y=0.7071067811865475
+        robot_pose.orientation.z=0.0
+        robot_pose.orientation.w=0.7071067811865475
+
         # delta_x_alpha,delta_y=self.parse_string_into_halves(chess_notation)
         delta_x_alpha=chess_notation[0]
         delta_y=chess_notation[1]
         delta_x=cross_reference_dict.get(delta_x_alpha)
-        robot_pose.position.x+=int(delta_x)*unit_square
-        robot_pose.position.y+=(int(delta_y[0])-1)*unit_square
+        robot_pose.position.y-=int(delta_x)*unit_square
+        robot_pose.position.x+=(int(delta_y[0])-1)*unit_square
 
         return robot_pose
-    
+
     def convert_chess_notation(self,chess_notation):
         try:
             # Create an empty chess board
             board = chess.Board()
 
-            # covert the normal algebric input to UCI 
+            # covert the normal algebric input to UCI
             move = board.push_san(chess_notation).uci()
 
             return move
         except ValueError:
             return None  # Invalid notation
-        
+
 
     def parse_string_into_halves(self,input_string):
         # Calculate the midpoint index
         midpoint = len(input_string) // 2
-        
-        
+
+
         # Split the string into two halves
         first_half = list(input_string[:midpoint])
         second_half = list(input_string[midpoint:])
-        
-        
+
+
         return first_half, second_half
-    
+
     def get_coordinate(self, count, chess_piece):
         if(chess_piece.isupper()):
             if(count<=8):
@@ -303,9 +310,9 @@ class ChessPoseConverter:
                 final_coordinates= "l" + str(count-8)
         print(final_coordinates)
         return final_coordinates
-        
+
     def get_complement(self, steps):
-       my_dict = {'e1g1': 'h1f1', 'e1c1': 'a1d1', 'e8g8': 'h8f8', 'e1c1':'a8d8'} 
+       my_dict = {'e1g1': 'h1f1', 'e1c1': 'a1d1', 'e8g8': 'h8f8', 'e1c1':'a8d8'}
        output=my_dict.get(steps)
        return output
 
