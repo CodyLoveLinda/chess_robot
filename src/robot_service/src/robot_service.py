@@ -247,7 +247,7 @@ class ChessPoseConverter:
         cross_reference_dict["i"]=-2
         cross_reference_dict["j"]=-1
         #unit_square = 0.0375
-        unit_square = 0.0208
+        unit_square = 0.0185
         robot_pose = Pose()
         #robot_pose.position.x=-0.0138171 - unit_square*4
         #robot_pose.position.y=0.693742 - unit_square
@@ -255,9 +255,9 @@ class ChessPoseConverter:
         #1HGFEDCBA Y-->
         #2 x |
         #3   v
-        robot_pose.position.x=0.0 + unit_square*4 #A1 position
-        robot_pose.position.y=0.0 +  unit_square*4
-        robot_pose.position.z=0.26
+        robot_pose.position.x=0.0 + unit_square*6 #A1 position
+        robot_pose.position.y=0.0 +  unit_square*6
+        robot_pose.position.z=0.21
         robot_pose.orientation.x=0.0
         robot_pose.orientation.y=0.7071067811865475
         robot_pose.orientation.z=0.0
