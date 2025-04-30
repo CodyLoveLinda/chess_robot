@@ -15,7 +15,7 @@ ros core
 ```
 ### Terminal 2
 ```bash
-rosrun jetcobot_moveit sync_plan.py
+rosrun jetcobot_moveit gripper_service.py
 ```
 ## Host
 ### Terminal 1

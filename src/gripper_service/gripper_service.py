@@ -8,7 +8,6 @@ from sensor_msgs.msg import JointState
 from pymycobot.mycobot import MyCobot
 
 from chess_robot_service.srv import gripper, gripperResponse
-self.mc.set_gripper_value(100, 50)
 
 mc = None
 
@@ -28,9 +27,11 @@ def handle_service_request(req):
     global mc
     rospy.loginfo("Received command: %s", req.command)
     if req.command == 'open':
-        mc.set_gripper_value(40, 50)
+        mc.set_gripper_value(30, 50)
+        time.sleep(1)
     if req.command == 'close':
-        mc.set_gripper_value(40, 50)
+        mc.set_gripper_value(0, 50)
+        time.sleep(1)
     feedback = True  #
     return gripperResponse(feedback=feedback)
 
