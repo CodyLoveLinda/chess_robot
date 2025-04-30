@@ -58,6 +58,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate services in the 'srv' folder
 add_service_files(
    FILES
+   gripper.srv
    chess_ai.srv
    motion_planning.srv
  )
