@@ -6,6 +6,8 @@ For running each sample code:
 - `Ros Noetic:` http://wiki.ros.org/noetic/Installation
 - `Gazebo:` https://classic.gazebosim.org/tutorials?tut=ros_installing&cat=connect_ros
 - `Catkin` https://catkin-tools.readthedocs.io/en/latest/
+## ROS Distributed Communication
+https://www.yahboom.com/build.html?id=10510&cid=648
 ## cobot280
 ### Terminal 1
 ```bash
@@ -13,7 +15,7 @@ ros core
 ```
 ### Terminal 2
 ```bash
-r
+rosrun jetcobot_moveit sync_plan.py
 ```
 ## Host
 ### Terminal 1
