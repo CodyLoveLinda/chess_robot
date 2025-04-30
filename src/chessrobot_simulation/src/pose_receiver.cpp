@@ -10,11 +10,13 @@
 #include <locale> // for std::tolower
 #include <cmath>  // for M_PI constant
 #include "../include/string_publisher.hpp"
+#include "../include/gripper_client.hpp"
 #include <thread>
 #include <chrono>
 
 // Global pointer for access in callback
-StringPublisher* string_publisher = nullptr;
+//StringPublisher* string_publisher = nullptr;
+StringServiceClient* gripper_client = nullptr;
 
 // Function to convert a string to lowercase
 std::string toLower(const std::string& str) {
@@ -161,13 +163,14 @@ bool openGripper(moveit::planning_interface::MoveGroupInterface& move_group_inte
   return success;
 }
 
-void gripper_control(std::string cmd)
+bool gripper_control(std::string cmd)
 {
-  if(string_publisher) {
-    string_publisher->publishMessage(cmd);
-    ROS_INFO("Gripper control successfully.");
+  if(gripper_client->callService(cmd)) {
+    ROS_INFO("Gripper %s successfully.", cmd);
+    return true;
   }
-  std::this_thread::sleep_for(std::chrono::milliseconds(500)); //0.5s
+  //std::this_thread::sleep_for(std::chrono::milliseconds(500)); //0.5s
+  return false;
 }
 
 bool pick(moveit::planning_interface::MoveGroupInterface& move_group_interface_arm,const geometry_msgs::Pose& target_pose,moveit::planning_interface::MoveGroupInterface& move_group_interface_gripper, const moveit::core::JointModelGroup*& joint_model_group_gripper, const std::string& str)
@@ -212,7 +215,7 @@ bool pick(moveit::planning_interface::MoveGroupInterface& move_group_interface_a
       // move_group_interface_arm.move();
       move_group_interface_arm.execute(trajectory);
       //closeGripper(move_group_interface_gripper,joint_model_group_gripper, str);
-      gripper_control("close");
+      if (!gripper_control("close")) return false;
       move_group_interface_arm.computeCartesianPath(waypoints_2, eef_step, jump_threshold, trajectory_2);
       move_group_interface_arm.execute(trajectory_2);
       ROS_INFO("Robot moved to the target pose successfully.");
@@ -272,7 +275,7 @@ bool place(moveit::planning_interface::MoveGroupInterface& move_group_interface_
       // move_group_interface_arm.move();
       move_group_interface_arm.execute(trajectory);
       //openGripper(move_group_interface_gripper,joint_model_group_gripper);
-      gripper_control("open");
+      if (!gripper_control("open")) return false;
       move_group_interface_arm.computeCartesianPath(waypoints_2, eef_step, jump_threshold, trajectory_2);
       move_group_interface_arm.execute(trajectory_2);
       ROS_INFO("Robot moved to the target pose successfully.");
@@ -371,7 +374,7 @@ bool poseCallback(chess_robot_service::motion_planning::Request  &req, chess_rob
   ROS_INFO_NAMED("tutorial", "Add an object into the world");
   planning_scene_interface.addCollisionObjects(collision_objects);
   //openGripper(move_group_interface_gripper,joint_model_group_gripper);
-  gripper_control("open");
+  if (!gripper_control("open")) return false;
   int count=0;
 
 
@@ -449,8 +452,11 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "pose_receiver");
   ros::NodeHandle nh;
   ros::ServiceServer service = nh.advertiseService("robot_service", poseCallback);
-  StringPublisher publisher;
-  string_publisher = &publisher;
+  //StringPublisher publisher;
+  //string_publisher = &publisher;
+  StringServiceClient client_;
+  gripper_client = &client_;
+
 
   ROS_INFO("Ready to execute motion planning");
 
